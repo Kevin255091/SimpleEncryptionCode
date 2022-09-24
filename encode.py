@@ -41,7 +41,7 @@ key_len = len(key)
 if output_file == None:
     output_file = input_file + '.encode'
 
-chunk_size = key_len
+chunk_size = (4096 // key_len) * key_len
 
 with open(input_file, "rb") as fin, open(output_file, "wb") as fout:
     while True:
@@ -51,8 +51,10 @@ with open(input_file, "rb") as fin, open(output_file, "wb") as fout:
             break # end of file
 
         barray = bytearray(chunk)
-
+        
+        j = 0
         for i in range(len(barray)):
-            barray[i] = (barray[i] + key[i]) % 256
+            barray[i] = (barray[i] + key[j]) % 256
+            j = (j + 1) % key_len
             
         fout.write(barray)
