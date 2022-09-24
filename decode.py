@@ -41,7 +41,7 @@ key_len = len(key)
 if output_file == None:
     output_file = input_file + '.decode'
 
-chunk_size = key_len
+chunk_size = (4096 // key_len) * key_len
 
 with open(input_file, "rb") as fin, open(output_file, "wb") as fout:
     while True:
@@ -52,10 +52,12 @@ with open(input_file, "rb") as fin, open(output_file, "wb") as fout:
 
         barray = bytearray(chunk)
 
+        j = 0
         for i in range(len(barray)):
-            if barray[i] >= key[i]:
-                barray[i] -= key[i]
+            if barray[i] >= key[j]:
+                barray[i] -= key[j]
             else:
-                barray[i] = 256 - (key[i]-barray[i])
+                barray[i] = 256 - (key[j]-barray[i])
+            j = (j + 1) % key_len
             
         fout.write(barray)
